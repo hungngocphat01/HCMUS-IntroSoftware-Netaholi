@@ -1,0 +1,20 @@
+{% extends 'home/base.html' %}
+
+{% block content %}
+    <h1>{{course.name}}</h1>
+    <img src="{{course.image_url}}">
+    <ul>
+        <li>Loại khóa học: {{course.ctype}}</li>
+        <li>Ngày bắt đầu: {{course.start_date}}</li>
+        <li>Trạng thái: {{course.get_status_display}}</li>
+        <li>Loại khóa học: {{course.ctype}}</li>
+        <li>Học phí: {{course.tuition_fee}}</li>
+        <li>Mô tả:
+            <p>{{course.description}}</p>
+        </li>
+        <li>Lịch trình:
+            <p>{{course.schedule}}</p>
+        </li>
+    </ul>
+{% endblock content %}
+

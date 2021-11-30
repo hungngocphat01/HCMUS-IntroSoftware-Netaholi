@@ -12,7 +12,7 @@ class Course(models.Model):
 
     name = models.CharField(verbose_name='Tên khóa học', max_length=MAX_LENGTH_LONG)
     ctype = models.CharField(verbose_name='Loại khóa học', max_length=MAX_LENGTH_MED)
-    start_date = models.DateField(verbose_name='Ngày bắt đầu')
+    start_date = models.DateField(verbose_name='Ngày bắt đầu', auto_now_add=True)
     status = models.CharField(verbose_name='Trạng thái khóa học', choices=STATUS_CHOICES, max_length=MAX_LENGTH_MED)
     tuition_fee = models.FloatField(verbose_name='Học phí')
     description = models.TextField(verbose_name='Mô tả khóa học')

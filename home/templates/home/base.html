@@ -4,6 +4,24 @@
         <title>Netaholi</title>
     </head>
     <body>
+        <nav>
+            <ul>
+                <li><a href="{% url 'home' %}">Trang chủ</a></li>
+            {% if request.user.is_authenticated %}
+                {% if not request.user.is_staff %}
+                    <li><a href="">Các khóa học của tôi</a></li>
+                {% else %}
+                    <li><a href="">Đi đến trang quản trị</a></li>
+                {% endif %}
+
+                Xin chào, {{request.user.first_name}}! <a href="{% url 'logout' %}">Đăng xuất</a>
+            {% else %}
+            <li><a href="{% url 'login' %}">Đăng nhập</a></li>
+            {% endif %}
+            <hr>
+            <ul>
+        </nav>
+
         {% block content %}
 
         {% endblock content %}        

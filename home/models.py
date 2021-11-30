@@ -30,4 +30,5 @@ def create_profile_signal(sender, instance, created, **kwargs):
     if created:
         print('Created a new profile for this user:', instance.username)
         UserProfile.objects.create(user=instance)
-    instance.userprofile.save()
+    if hasattr(instance, 'userprofile'):
+        instance.userprofile.save()

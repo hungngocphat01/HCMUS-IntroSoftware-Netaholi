@@ -1,0 +1,28 @@
+{% extends 'home/base.html' %}
+
+{% block content %}
+    <h1>Welcome to Netaholi</h1>
+    <h2>Đăng nhập</h2>
+
+    <form method="post" action="">
+        {% csrf_token %}
+        <label for="username">Tên người dùng</label>
+            <input type="text" name="username" required>
+        <label for="password">Mật khẩu</label>
+            <input type="password" name="password" required>
+
+        <input type="submit" value="Đăng nhập">
+        <br>
+        <p>Bạn chưa có tài khoản? <a href="{% url 'register' %}">Đăng ký ngay!</a></p>
+    </form>
+
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+            <li  {% if message.tags %} class="{{message.tags}}" {% endif %}> {{message}} </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+{% endblock content %}
+
+

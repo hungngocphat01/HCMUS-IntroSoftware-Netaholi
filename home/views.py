@@ -1,6 +1,10 @@
+from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.http import HttpRequest
 from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import authenticate, login, logout
+
 from courses.models import Course
 
 from .forms import TeacherSignUpForm, SignUpForm
@@ -36,3 +40,23 @@ def register_page_view(req: HttpRequest):
     else:
         context = {'form': form}
         return render(req, 'home/register.html', context)
+
+def login_page_view(req: HttpRequest):
+    if req.method == 'GET':
+        return render(req, 'home/login.html')
+    elif req.method == 'POST':
+        username = req.POST.get('username')
+        password = req.POST.get('password')
+        user = authenticate(username=username, password=password)
+        if user is not None:
+            print('User authenticated:', username)
+            login(req, user)
+            return redirect('home')
+        else:
+            print('Login error')
+            messages.error(req, 'Sai tên đăng nhập hoặc mật khẩu')
+            return redirect('login')
+
+def logout_page_view(req: HttpRequest):
+    logout(req)
+    return redirect('login')

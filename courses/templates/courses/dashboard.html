@@ -1,0 +1,39 @@
+{% extends "home/base.html" %}
+
+{% block content %}
+    {% if messages %}
+        Thông báo
+        <ul>
+        {% for message in messages %}
+            <li>{{ message }}</li>
+        {% endfor %}
+        <ul>
+    {% endif %}
+
+    <h1>{{course.name}}</h1>
+    <img src="{{course.image_url}}">
+    <ul>
+        <li>Trạng thái: {{course.get_status_display}}</li>
+        <li>Lịch trình:
+            <p>{{course.schedule}}</p>
+        </li>
+    </ul>
+
+    <h2>Tài liệu</h2>
+    <ul>
+    {% for material in materials %}
+        {% if material.type == 'document' %}
+            <li><a href="{% url 'material' course.id material.id %}">{{ material.title }}</a></li>
+        {% endif %}
+    {% endfor %}
+    </ul>
+
+    <h2>Bài tập</h2>
+    <ul>
+    {% for material in materials %}
+        {% if material.type == 'assignment' %}
+            <li><a href="{% url 'material' course.id material.id %}">{{ material.title }}</a></li>
+        {% endif %}
+    {% endfor %}
+    </ul>
+{% endblock %}

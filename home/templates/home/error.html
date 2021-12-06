@@ -1,0 +1,10 @@
+{% extends 'home/base.html' %}
+{% load static %}
+
+{% block content %}
+    <h1>Uh oh!</h1>
+    <h2>Hệ thống của chúng tôi đã phát hiện ra lỗi</h2>
+    {{ error_message }} <br>
+    Vui lòng kiểm tra lại thao tác trước đó!<br>
+    <button onclick="history.back()">Quay lại</button>
+{% endblock %}

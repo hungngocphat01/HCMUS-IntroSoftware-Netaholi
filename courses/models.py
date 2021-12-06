@@ -1,7 +1,10 @@
 from django.db import models
+from django.contrib.auth.models import User
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 MAX_LENGTH_LONG = 100
 MAX_LENGTH_MED = 50
+
 
 class Course(models.Model):
     STATUS_CHOICES = (
@@ -21,3 +24,32 @@ class Course(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Rating(models.Model):
+    user = models.OneToOneField(User, on_delete=models.SET_NULL, null=True, verbose_name='Người dùng')
+    course = models.OneToOneField(Course, on_delete=models.CASCADE, verbose_name='Khóa học')
+    content = models.TextField(verbose_name='Nội dung')
+    star = models.SmallIntegerField(
+        validators=[MaxValueValidator(5), MinValueValidator(1)],
+        verbose_name='Điểm'
+    )
+    date_created = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("user", "course")
+
+    def __str__(self):
+        return self.course.name + '_' + self.user.username
+
+
+class Material(models.Model):
+    TYPE_CHOICES = (('assignment', 'Bài tập'), ('document', 'Tài liệu'))
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    title = models.CharField(max_length=50)
+    content = models.TextField()
+    type = models.CharField(max_length=10, choices=TYPE_CHOICES)
+
+    def __str__(self):
+        return self.course.name + '_' + self.title
+

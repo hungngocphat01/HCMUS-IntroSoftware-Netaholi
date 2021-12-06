@@ -7,6 +7,7 @@ from django.dispatch import receiver
 MAX_LENGTH_LONG = 100
 MAX_LENGTH_MED = 50
 
+
 class UserProfile(models.Model):
     GENDER_CHOICES = (
         (True, 'Nam'),
@@ -23,6 +24,7 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return self.user.last_name + ' ' + self.user.first_name
+
 
 @receiver(post_save, sender=User)
 def create_profile_signal(sender, instance, created, **kwargs):

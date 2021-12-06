@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django.forms import widgets
 from .models import MAX_LENGTH_LONG, MAX_LENGTH_MED
 
+
 class SignUpForm(UserCreationForm):
     """
     Sign up form for students
@@ -22,7 +23,9 @@ class SignUpForm(UserCreationForm):
     
     class Meta:
         model = User
-        fields = ('username', 'last_name', 'first_name', 'gender', 'email', 'birthday', 'profession', 'department', 'password1', 'password2')
+        fields = ('username', 'last_name', 'first_name', 'gender', 'email', 'birthday', 'profession',
+                  'department', 'password1', 'password2')
+
 
 class TeacherSignUpForm(SignUpForm):
     """
@@ -32,4 +35,5 @@ class TeacherSignUpForm(SignUpForm):
 
     class Meta:
         model = User
-        fields = ('username', 'first_name', 'last_name', 'email', 'password1', 'password2', 'profession', 'department', 'bio')
+        fields = ('username', 'first_name', 'last_name', 'email', 'password1', 'password2', 'profession',
+                  'department', 'bio')

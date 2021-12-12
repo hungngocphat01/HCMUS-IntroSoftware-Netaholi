@@ -1,0 +1,43 @@
+{% extends 'home/base.html' %}
+{% load static %}
+
+{% block content %}
+    <div>
+        <h1>Đăng ký khóa học</h1>
+        <h2>{{ course.name }}</h2>
+        <img src="{{ course.image_url }}" alt="course-cover">
+        <p>{{ course.description }}</p>
+    </div>
+
+    <div>
+        <ul>
+            <li>Lịch học: {{ course.schedule }}</li>
+            <li>Ngày bắt đầu học: {{ course.start_date }}</li>
+            <li>Loại khóa học: {{ course.ctype }}</li>
+        </ul>
+        <p>Mã đơn đăng ký: {{ invoice_id }}</p>
+        <p>Bạn cần thanh toán: {{ course.tuition_fee }}</p>
+    </div>
+
+    <div>
+        <p>Vui lòng chuyển khoản sang một trong các STK sau</p>
+        <ul>
+            <li>Vietcombank: 187618738991 (Nguyen Van A)</li>
+            <li>Techcombank: 75572878773 (Phan Van B)</li>
+            <li>BIDV: 12008767578989 (Dinh Thi C)</li>
+        </ul>
+        <p>Phần chú thích ghi mã đơn đăng ký.</p>
+    </div>
+
+    <form method="POST" action="">
+    {% csrf_token %}
+        <div>
+            <input type="checkbox" name="agree-checkbox" required>
+            Tôi đồng ý với các điều khoản của Netaholi khi đăng ký khóa học này
+        </div>
+        <div>
+            Sau khi chuyển tiền xong, nhấn vào nút dưới đây.<br>
+            <input type="Submit" value="Hoàn tất">
+        </div>
+    </form>
+{% endblock %}

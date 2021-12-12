@@ -25,6 +25,21 @@ class Course(models.Model):
     def __str__(self):
         return self.name
 
+    def is_enrolled(self, username):
+        if Course.objects.filter(id=self.id, coursestudents__student__username=username).exists():
+            return True
+        elif Course.objects.filter(id=self.id, courseteachers__teacher__username=username).exists():
+            return True
+        return False
+
+    def enroll_student(self, username):
+        if self.is_enrolled(username):
+            return False
+        else:
+            student = User.objects.get(username=username)
+            self.coursestudents_set.create(student=student)
+            return True
+
 
 class Rating(models.Model):
     user = models.OneToOneField(User, on_delete=models.SET_NULL, null=True, verbose_name='Người dùng')
@@ -52,4 +67,32 @@ class Material(models.Model):
 
     def __str__(self):
         return self.course.name + '_' + self.title
+
+
+class CourseTeachers(models.Model):
+    ROLE_CHOICES = (
+        ('lecturer', 'Giảng viên'),
+        ('ta', 'Trợ giảng')
+    )
+    teacher = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Giảng viên')
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, verbose_name='Khóa học')
+    role = models.CharField(max_length=100, verbose_name='Vai trò')
+    date_joined = models.DateField(auto_now_add=True, verbose_name='Ngày tham gia khóa học')
+
+    class Meta:
+        unique_together = ("teacher", "course")
+
+
+class CourseStudents(models.Model):
+    student = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Học viên')
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, verbose_name='Khóa học')
+    date_joined = models.DateField(auto_now_add=True, verbose_name='Ngày tham gia khóa học')
+    score = models.FloatField(
+        verbose_name='Điểm tổng kết',
+        validators=[MaxValueValidator(10), MinValueValidator(0)],
+        null=True
+    )
+
+    class Meta:
+        unique_together = ("student", "course")
 

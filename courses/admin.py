@@ -6,4 +6,5 @@ from courses.models import *
 admin.site.register(Course)
 admin.site.register(Material)
 admin.site.register(Rating)
-
+admin.site.register(CourseTeachers)
+admin.site.register(CourseStudents)

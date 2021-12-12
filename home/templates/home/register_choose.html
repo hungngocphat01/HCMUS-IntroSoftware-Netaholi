@@ -1,0 +1,9 @@
+{% extends 'home/base.html' %}
+{% load static %}
+
+{% block content %}
+    <ul>
+        <li><a href="{% url 'register' 'teacher' %}">Đăng ký giảng viên</a></li>
+        <li><a href="{% url 'register' 'student' %}">Đăng ký học viên</a></li>
+    </ul>
+{% endblock content %}

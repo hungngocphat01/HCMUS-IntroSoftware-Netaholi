@@ -1,6 +1,6 @@
 from django.contrib import messages
 from django.shortcuts import render, redirect
-from django.http import HttpRequest
+from django.http import HttpRequest, HttpResponse
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
@@ -80,3 +80,7 @@ def login_page_view(req: HttpRequest):
 def logout_page_view(req: HttpRequest):
     logout(req)
     return redirect('login')
+
+
+def choose_acc_register_view(req: HttpRequest):
+    return render(req, 'home/register_choose.html')

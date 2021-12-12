@@ -26,6 +26,7 @@ class UserProfile(models.Model):
         return self.user.last_name + ' ' + self.user.first_name
 
 
+# Database trigger
 @receiver(post_save, sender=User)
 def create_profile_signal(sender, instance, created, **kwargs):
     # If a NEWLY CREATED User object emitted this signal -> create a profile for it

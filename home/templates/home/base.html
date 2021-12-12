@@ -11,7 +11,7 @@
                 {% if not request.user.is_staff %}
                     <li><a href="">Các khóa học của tôi</a></li>
                 {% else %}
-                    <li><a href="">Đi đến trang quản trị</a></li>
+                    <li><a href="{% url 'manager_home' %}">Đi đến trang quản trị</a></li>
                 {% endif %}
 
                 Xin chào, {{request.user.first_name}}! <a href="{% url 'logout' %}">Đăng xuất</a>
@@ -19,11 +19,12 @@
             <li><a href="{% url 'login' %}">Đăng nhập</a></li>
             {% endif %}
             <hr>
-            <ul>
+            </ul>
         </nav>
 
         {% block content %}
 
-        {% endblock content %}        
+        {% endblock content %}
+        {% include 'home/render_messages.html' %}
     </body>
 </html>

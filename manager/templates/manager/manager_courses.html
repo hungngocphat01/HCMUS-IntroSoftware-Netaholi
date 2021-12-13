@@ -1,0 +1,38 @@
+{% extends 'home/base.html' %}
+
+{% block content %}
+    <h1>Quản trị khóa học</h1>
+    <div>
+        <a href="{% url 'course_create' %}">Tạo khóa học mới</a>
+    </div>
+
+    <div>
+        <h2>Các khóa học hiện có trong hệ thống</h2>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Tên khóa học</th>
+                    <th>Loại khóa học</th>
+                    <th>Học phí</th>
+                    <th>Ngày bắt đầu</th>
+                    <th>Tình trạng</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for course in courses %}
+                <tr>
+                    <td scope="row">{{ course.name }}</td>
+                    <td>{{ course.ctype }}</td>
+                    <td>{{ course.tuition_fee }}</td>
+                    <td>{{ course.start_date }}</td>
+                    <td>{{ course.get_status_display }}</td>
+                    <td><a href="{% url 'course_edit' course.id %}">Sửa</a></td>
+                    <td><a href="{% url 'course_delete' course.id %}">Xóa</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    <div>
+{% endblock %}

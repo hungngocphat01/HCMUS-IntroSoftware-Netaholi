@@ -1,3 +1,5 @@
+from django.contrib import messages
+from django.http.request import HttpRequest
 from django.shortcuts import redirect, render, get_object_or_404
 from django.urls import reverse
 from courses.models import Course, Material
@@ -13,6 +15,12 @@ def manager_home_view(req):
     context = {}
     return render(req, 'manager/manager_home.html', context)
 
+@admin_only
+def manager_courses_view(req):
+    courses = Course.objects.all()
+
+    context = {'courses': courses}
+    return render(req, 'manager/manager_courses.html', context)
 
 @admin_only
 def course_create_view(req):
@@ -34,9 +42,9 @@ def course_create_view(req):
         return redirect('home')
 
 
-@teacher_admin_only
-def course_edit_view(req, pk):
-    course = Course.objects.get(id=pk)
+@admin_only
+def course_edit_view(req, course_id):
+    course = Course.objects.get(id=course_id)
     form = CourseDetailsForm(instance=course)
     if req.method == 'GET':
         context = {'form': form, 'action': 'Chỉnh sửa thông tin'}
@@ -49,3 +57,16 @@ def course_edit_view(req, pk):
         else:
             print("Form invalid!")
         return redirect('home')
+
+@admin_only
+def course_delete_view(req: HttpRequest, course_id):
+    course = get_object_or_404(Course, id=course_id)
+
+    if req.method == 'GET':
+        context = {'course': course}
+        return render(req, 'courses/delete.html', context)
+    elif req.method == 'POST':
+        course.delete()
+        course_name = course.name
+        messages.info(req, f"Khóa học đã được xóa: {course_name}")
+        return redirect(req, 'manager_courses')

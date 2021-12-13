@@ -16,6 +16,12 @@
             <p>{{course.schedule}}</p>
         </li>
     </ul>
-    <a href="{% url 'enroll' course.id %}">Đăng ký ngay!</a>
+
+    {% if user_enrolled %}
+        <a href="{% url 'dashboard' course.id %}">Đi đến trang chính khóa học</a>
+    {% else %}
+        <a href="{% url 'enroll' course.id %}">Đăng ký ngay!</a>
+    {% endif %}
+    
 {% endblock content %}
 

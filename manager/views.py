@@ -15,12 +15,14 @@ def manager_home_view(req):
     context = {}
     return render(req, 'manager/manager_home.html', context)
 
+
 @admin_only
 def manager_courses_view(req):
     courses = Course.objects.all()
 
     context = {'courses': courses}
     return render(req, 'manager/manager_courses.html', context)
+
 
 @admin_only
 def course_create_view(req):
@@ -33,13 +35,18 @@ def course_create_view(req):
         return render(req, 'courses/create_edit.html', context)
     if req.method == 'POST':
         print("POST received")
-        form = CourseDetailsForm(req.POST)
+        form = CourseDetailsForm(req.POST, req.FILES)
         if form.is_valid():
-            form.save()
+            course = form.save(commit=False)
+            course.cover_image_binary = form.cleaned_data['cover_image'].file.read()
+            course.save()
+            messages.info(req, f"Khóa học đã được tạo: {course.name}")
             print('New course created')
+            return redirect('course_create')
         else:
+            print(form.errors)
             print('Form invalid!')
-        return redirect('home')
+        return redirect('course_create')
 
 
 @admin_only
@@ -52,11 +59,16 @@ def course_edit_view(req, course_id):
     else:
         form = CourseDetailsForm(req.POST, req.FILES, instance=course)
         if form.is_valid():
-            form.save()
+            course = form.save(commit=False)
+            course.cover_image_binary = form.cleaned_data['cover_image'].file.read()
+            course.save()
+            messages.info(f"Khóa học đã được tạo: {course.name}")
             print("Course saved!")
+            return redirect('manager_course')
         else:
             print("Form invalid!")
         return redirect('home')
+
 
 @admin_only
 def course_delete_view(req: HttpRequest, course_id):
@@ -66,8 +78,8 @@ def course_delete_view(req: HttpRequest, course_id):
         context = {'course': course}
         return render(req, 'courses/delete.html', context)
     elif req.method == 'POST':
-        course.delete()
         course_name = course.name
+        course.delete()
         messages.info(req, f"Khóa học đã được xóa: {course_name}")
         return redirect(req, 'manager_courses')
 
@@ -82,7 +94,7 @@ def teacher_approve_list_view(req: HttpRequest):
         teacher_username = req.POST.get('teacher_username')
         teacher_instance = get_object_or_404(User, username=teacher_username)
         teacher_name = teacher_instance.last_name + teacher_instance.first_name
-        
+
         if 'req_approve' in req.POST:
             teacher_instance.is_active = True
             teacher_instance.save()
@@ -93,9 +105,9 @@ def teacher_approve_list_view(req: HttpRequest):
             messages.info(f"Đã từ chối giáo viên: {teacher_name}")
             # TODO: send notification email
         else:
-            return render(req, 'home/error.html', 
-                {'error_message': 'Chúng tôi không thể xử lý yêu cầu này. ' 
-                'Vui lòng liên hệ đội ngũ phát triển phần mềm.'})
+            return render(req, 'home/error.html',
+                          {'error_message': 'Chúng tôi không thể xử lý yêu cầu này. '
+                                            'Vui lòng liên hệ đội ngũ phát triển phần mềm.'})
 
     context = {'waiting_teachers': waiting_teachers}
     return render(req, 'manager/teacher_approve_list.html', context)

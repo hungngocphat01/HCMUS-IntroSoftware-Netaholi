@@ -1,6 +1,9 @@
+import base64
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django.dispatch import receiver
+# from django.db.models.signals impor
 
 MAX_LENGTH_LONG = 100
 MAX_LENGTH_MED = 50
@@ -20,7 +23,8 @@ class Course(models.Model):
     tuition_fee = models.FloatField(verbose_name='Học phí')
     description = models.TextField(verbose_name='Mô tả khóa học')
     schedule = models.TextField(verbose_name='Lịch trình')
-    image_url = models.URLField(verbose_name='Link ảnh minh họa', null=True)
+    cover_image = models.ImageField(verbose_name='Ảnh minh họa', null=True)
+    cover_image_binary = models.BinaryField(null=True)
 
     def __str__(self):
         return self.name
@@ -39,6 +43,9 @@ class Course(models.Model):
             student = User.objects.get(username=username)
             self.coursestudents_set.create(student=student)
             return True
+
+    def get_base64_image(self):
+        return base64.b64encode(self.cover_image_binary.tobytes()).decode('utf-8')
 
 
 class Rating(models.Model):
@@ -95,4 +102,3 @@ class CourseStudents(models.Model):
 
     class Meta:
         unique_together = ("student", "course")
-

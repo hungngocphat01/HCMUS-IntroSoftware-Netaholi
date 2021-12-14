@@ -1,11 +1,21 @@
 {% extends 'home/base.html' %}
+{% load netahol_filters %}
 
 {% block content %}
     <h1>{{action}} khóa học</h1>
-    <form method="post" action="">
+    {% if form.instance %}
+        {% if form.instance.cover_image_binary|length > 0 %}
+            <img src="data:image/png;base64,{{ form.instance.get_base64_image }}" alt="Ảnh minh họa {{ course.name }}">
+        {% endif %}
+    {% endif %}
+    <form method="post" action="" enctype="multipart/form-data">
         {% csrf_token %}
         {{form.as_p}}
         <input type="submit" value="Xác nhận">
+
+        {% if form.instance.id %}
+            <a href="{% url 'course_delete' form.instance.id %}">Xóa</a>
+        {% endif %}
     </form>
 {% endblock content %}
 

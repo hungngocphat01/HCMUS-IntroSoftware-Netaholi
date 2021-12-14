@@ -1,5 +1,6 @@
 {% extends 'home/base.html' %}
 {% load static %}
+{% load netahol_filters %}
 
 {% block content %}
     <h1>Welcome to Netaholi</h1>
@@ -7,7 +8,7 @@
 
     {% for course in courses %}
         <h3><a href="{% url 'details' course.id %}">{{course.name}}</a></h3>
-        <img src="{{course.image_url}}">
+        <img src="data:image/png;base64,{{ course.get_base64_image }}" alt="Ảnh minh họa {{ course.name }}">
         <ul>
             <li>Loại khóa học: {{course.ctype}}</li>
             <li>Ngày bắt đầu: {{course.start_date}}</li>

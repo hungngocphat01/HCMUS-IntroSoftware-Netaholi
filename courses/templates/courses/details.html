@@ -2,7 +2,7 @@
 
 {% block content %}
     <h1>{{course.name}}</h1>
-    <img src="{{course.image_url}}">
+    <img src="data:image/png;base64,{{ course.get_base64_image }}" alt="Ảnh minh họa {{ course.name }}">
     <ul>
         <li>Loại khóa học: {{course.ctype}}</li>
         <li>Ngày bắt đầu: {{course.start_date}}</li>

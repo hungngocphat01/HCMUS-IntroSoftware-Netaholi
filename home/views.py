@@ -48,19 +48,22 @@ def account_register_view(req: HttpRequest, account_type):
                 user.userprofile.bio = form.cleaned_data.get('bio')
                 user.userprofile.is_teacher = True
                 user.is_active = False
+                messages.warning('Tài khoản của bạn đã được tạo, vui lòng đợi xác nhận từ phía hệ thống.')
             user.userprofile.gender = form.cleaned_data.get('gender')
             user.save()
-            print('User created!')
-        else:
-            return render(req, 'home/error.html',
-                          {'error_message': 'Thông tin bạn đã nhập không hợp lệ'})
-        return redirect('home')
-    else:
-        context = {'form': form}
-        return render(req, 'home/register.html', context)
+
+            if account_type != 'teacher':
+                messages.info('Tài khoản của bạn đã được tạo!')
+            return redirect(req, 'login')
+        
+    context = {'form': form}
+    return render(req, 'home/register.html', context)
 
 
 def login_page_view(req: HttpRequest):
+    """
+    Login page of the website
+    """
     if req.method == 'GET':
         return render(req, 'home/login.html')
     elif req.method == 'POST':

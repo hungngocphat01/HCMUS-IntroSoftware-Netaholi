@@ -21,10 +21,12 @@
             <hr>
             </ul>
         </nav>
+        
+        {% include 'home/render_messages.html' %}
+        {% include 'home/render_form_errors.html' %}
 
         {% block content %}
 
         {% endblock content %}
-        {% include 'home/render_messages.html' %}
     </body>
 </html>

@@ -17,11 +17,15 @@
         </li>
     </ul>
 
-    {% if user_enrolled %}
-        <a href="{% url 'dashboard' course.id %}">Đi đến trang chính khóa học</a>
+    <div>
+    {% if course.status == 'ended' %}
+        Khóa học đã hết hạn. Không thể đăng ký.
+    {% elif user_enrolled %}
+        Bạn đã đăng ký. <a href="{% url 'dashboard' course.id %}">Đi đến trang chính khóa học</a>.
     {% else %}
         <a href="{% url 'enroll' course.id %}">Đăng ký ngay!</a>
     {% endif %}
+    <div>
     
 {% endblock content %}
 

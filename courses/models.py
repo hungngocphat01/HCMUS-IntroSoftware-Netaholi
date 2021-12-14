@@ -33,7 +33,7 @@ class Course(models.Model):
         return False
 
     def enroll_student(self, username):
-        if self.is_enrolled(username):
+        if self.is_enrolled(username) or self.status == 'ended':
             return False
         else:
             student = User.objects.get(username=username)

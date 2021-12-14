@@ -33,20 +33,21 @@ def enroll_view(req: HttpRequest, course_id):
     if course.is_enrolled(user.username):
         return render(req, 'home/error.html', {'error_message': 'Bạn đã đăng ký vào khóa học này rồi!'})
 
-    if req.method == 'GET':
-        # Invoice id is a random 5-byte hex string (for emulation)
-        context = {'course': course, 'invoice_id': secrets.token_hex(5)}
-        return render(req, 'courses/enroll.html', context)
-    elif req.method == 'POST':
+    if req.method == 'POST':
         # Check if user checked the "agree" box
         if not req.POST.get('agree-checkbox'):
             messages.error(req, 'Bạn chưa đồng ý với điều khoản của khóa học')
             return redirect('enroll')
         if course.enroll_student(user):
             return redirect(reverse('dashboard', kwargs={'course_id': course_id}))
-        else:
-            return render(req, 'home/error.html',
-                          {'error_message': 'Không thể đăng ký bạn vào khóa học! Vui lòng liên hệ quản trị viên.'})
+        
+    if course.status == 'ended':
+        return render(req, 'home/error.html',
+            {'error_message': 'Không thể đăng ký bạn vào khóa học do đã hết hạn đăng ký!'})
+    
+    # Invoice id is a random 5-byte hex string (for emulation)
+    context = {'course': course, 'invoice_id': secrets.token_hex(5)}
+    return render(req, 'courses/enroll.html', context)
 
 
 @enrolled_only

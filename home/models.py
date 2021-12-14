@@ -25,6 +25,10 @@ class UserProfile(models.Model):
     def __str__(self):
         return self.user.last_name + ' ' + self.user.first_name
 
+    @staticmethod
+    def get_all_waiting_teachers():
+        return User.objects.filter(userprofile__is_teacher=True, is_active=False)
+
 
 # Database trigger
 @receiver(post_save, sender=User)

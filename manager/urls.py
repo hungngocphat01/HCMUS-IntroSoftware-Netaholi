@@ -7,4 +7,5 @@ urlpatterns = [
     path('create/course', views.course_create_view, name='course_create'),
     path('edit/course/<str:course_id>', views.course_edit_view, name='course_edit'),
     path('delete/course/<str:course_id>', views.course_delete_view, name='course_delete'),
+    path('tchrapprove', views.teacher_approve_list_view, name='aprv_teacher_list'),
 ]

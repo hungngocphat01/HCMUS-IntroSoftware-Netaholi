@@ -3,7 +3,7 @@
 {% block content %}
     <h1>Quản trị hệ thống</h1>
     <ul>
-        <li><a>Xét duyệt giáo viên</a></li>
+        <li><a href="{% url 'aprv_teacher_list' %}">Xét duyệt giáo viên</a></li>
         <li><a href="{% url 'manager_course' %}">Quản trị khóa học</a></li>
         <li><a>Quản trị người dùng</a></li>
     </ul>

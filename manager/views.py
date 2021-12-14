@@ -70,3 +70,32 @@ def course_delete_view(req: HttpRequest, course_id):
         course_name = course.name
         messages.info(req, f"Khóa học đã được xóa: {course_name}")
         return redirect(req, 'manager_courses')
+
+
+@admin_only
+def teacher_approve_list_view(req: HttpRequest):
+    """
+    Show a list of teachers waiting for approval
+    """
+    waiting_teachers = UserProfile.get_all_waiting_teachers()
+    if req.method == 'POST':
+        teacher_username = req.POST.get('teacher_username')
+        teacher_instance = get_object_or_404(User, username=teacher_username)
+        teacher_name = teacher_instance.last_name + teacher_instance.first_name
+        
+        if 'req_approve' in req.POST:
+            teacher_instance.is_active = True
+            teacher_instance.save()
+            messages.info(f"Đã xét duyệt giáo viên: {teacher_name}")
+            # TODO: send notification email
+        elif 'req_disaprv' in req.POST:
+            teacher_instance.delete()
+            messages.info(f"Đã từ chối giáo viên: {teacher_name}")
+            # TODO: send notification email
+        else:
+            return render(req, 'home/error.html', 
+                {'error_message': 'Chúng tôi không thể xử lý yêu cầu này. ' 
+                'Vui lòng liên hệ đội ngũ phát triển phần mềm.'})
+
+    context = {'waiting_teachers': waiting_teachers}
+    return render(req, 'manager/teacher_approve_list.html', context)

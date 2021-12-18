@@ -1,8 +1,8 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from django.forms import widgets
-from .models import MAX_LENGTH_LONG, MAX_LENGTH_MED, Course, Material
+from django.forms import fields, widgets
+from .models import MAX_LENGTH_LONG, MAX_LENGTH_MED, Course, Material, Rating
 
 
 class CourseDetailsForm(forms.ModelForm):
@@ -22,3 +22,14 @@ class MaterialForm(forms.ModelForm):
         model = Material
         fields = ('title', 'content', 'type')
 
+class RatingForm(forms.ModelForm):
+    """
+    Form for rating a course
+    """
+    class Meta:
+        model = Rating
+        fields = ('star', 'content')
+        widgets = {
+            'star': forms.HiddenInput(),
+            'content': forms.Textarea()
+        }

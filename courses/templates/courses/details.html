@@ -2,11 +2,11 @@
 
 {% block content %}
     <h1>{{course.name}}</h1>
-    <img src="data:image/png;base64,{{ course.get_base64_image }}" alt="Ảnh minh họa {{ course.name }}">
+    <img src="data:image/png;base64,{{ course.base64_cover_image }}" alt="Ảnh minh họa {{ course.name }}">
     <ul>
         <li>Loại khóa học: {{course.ctype}}</li>
         <li>Ngày bắt đầu: {{course.start_date}}</li>
-        <li>Trạng thái: {{course.get_status_display}}</li>
+        <li>Thời hạn: {{ course.duration }} ngày ({{course.get_status_display}})</li>
         <li>Loại khóa học: {{course.ctype}}</li>
         <li>Học phí: {{course.tuition_fee}}</li>
         <li>Mô tả:
@@ -18,10 +18,15 @@
     </ul>
 
     <div>
-    {% if course.status == 'ended' %}
+    {% if user_enrolled %}
+        Bạn đã đăng ký. <a href="{% url 'dashboard' course.id %}">Đi đến trang chính khóa học</a>.    
+        {% if course.is_ended %}
+            <p>
+                Khóa học đã hoàn tất. Hãy dành ra chút thời gian để <a href="{% url 'course_rate' course.id %}">đánh giá</a> khóa học này nhé!
+            </p>
+        {% endif %}
+    {% elif course.is_ended %}
         Khóa học đã hết hạn. Không thể đăng ký.
-    {% elif user_enrolled %}
-        Bạn đã đăng ký. <a href="{% url 'dashboard' course.id %}">Đi đến trang chính khóa học</a>.
     {% else %}
         <a href="{% url 'enroll' course.id %}">Đăng ký ngay!</a>
     {% endif %}

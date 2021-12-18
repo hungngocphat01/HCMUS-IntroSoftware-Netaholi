@@ -15,6 +15,7 @@
                     <th>Loại khóa học</th>
                     <th>Học phí</th>
                     <th>Ngày bắt đầu</th>
+                    <th>Thời hạn (ngày)</th>
                     <th>Tình trạng</th>
                     <th></th>
                     <th></th>
@@ -28,6 +29,7 @@
                     <td>{{ course.tuition_fee }}</td>
                     <td>{{ course.start_date }}</td>
                     <td>{{ course.get_status_display }}</td>
+                    <td>{{ course.duration }}</td>
                     <td><a href="{% url 'course_edit' course.id %}">Sửa</a></td>
                     <td><a href="{% url 'course_delete' course.id %}">Xóa</a></td>
                 </tr>

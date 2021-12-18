@@ -1,4 +1,5 @@
 import base64
+from datetime import date, datetime
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MaxValueValidator, MinValueValidator
@@ -20,6 +21,7 @@ class Course(models.Model):
     ctype = models.CharField(verbose_name='Loại khóa học', max_length=MAX_LENGTH_MED)
     start_date = models.DateField(verbose_name='Ngày bắt đầu', auto_now_add=True)
     status = models.CharField(verbose_name='Trạng thái khóa học', choices=STATUS_CHOICES, max_length=MAX_LENGTH_MED)
+    duration = models.IntegerField(verbose_name='Thời hạn khóa học (ngày)')
     tuition_fee = models.FloatField(verbose_name='Học phí')
     description = models.TextField(verbose_name='Mô tả khóa học')
     schedule = models.TextField(verbose_name='Lịch trình')
@@ -44,8 +46,18 @@ class Course(models.Model):
             self.coursestudents_set.create(student=student)
             return True
 
-    def get_base64_image(self):
+    @property
+    def base64_cover_image(self):
         return base64.b64encode(self.cover_image_binary.tobytes()).decode('utf-8')
+
+    @property
+    def is_ended(self):
+        # Each time this field is accessed: check for validity
+        days_from_start = (datetime.now().date() - self.start_date).days
+        if self.status != 'ended' and days_from_start > self.duration:
+            self.status = 'ended'
+
+        return self.status == 'ended'
 
 
 class Rating(models.Model):
@@ -54,7 +66,7 @@ class Rating(models.Model):
     content = models.TextField(verbose_name='Nội dung')
     star = models.SmallIntegerField(
         validators=[MaxValueValidator(5), MinValueValidator(1)],
-        verbose_name='Điểm'
+        verbose_name='Số sao'
     )
     date_created = models.DateTimeField(auto_now_add=True)
 

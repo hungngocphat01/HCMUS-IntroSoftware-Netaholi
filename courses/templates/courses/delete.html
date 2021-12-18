@@ -3,12 +3,11 @@
 {% block content %}
     <div>
         <h1>{{course.name}}</h1>
-            <img src="data:image/png;base64,{{ course.get_base64_image }}" alt="Ảnh minh họa {{ course.name }}">
+            <img src="data:image/png;base64,{{ course.base64_cover_image }}" alt="Ảnh minh họa {{ course.name }}">
         <ul>
             <li>Loại khóa học: {{course.ctype}}</li>
             <li>Ngày bắt đầu: {{course.start_date}}</li>
-            <li>Trạng thái: {{course.get_status_display}}</li>
-            <li>Loại khóa học: {{course.ctype}}</li>
+            <li>Thời hạn: {{ course.duration }} ngày ({{course.get_status_display}})</li>            <li>Loại khóa học: {{course.ctype}}</li>
             <li>Học phí: {{course.tuition_fee}}</li>
             <li>Mô tả:
                 <p>{{course.description}}</p>

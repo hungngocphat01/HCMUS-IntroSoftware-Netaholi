@@ -62,7 +62,7 @@ def course_edit_view(req, course_id):
             course = form.save(commit=False)
             course.cover_image_binary = form.cleaned_data['cover_image'].file.read()
             course.save()
-            messages.info(f"Khóa học đã được tạo: {course.name}")
+            messages.info(req, f"Khóa học đã được sửa: {course.name}")
             print("Course saved!")
             return redirect('manager_course')
         else:

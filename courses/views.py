@@ -122,4 +122,40 @@ def lesson_view(req, course_id):
     Attend a course lesson
     """
     course = get_object_or_404(Course, id=course_id)
-    return render(req, 'courses/lesson.html', {'course': course})
+    if not course.is_ended:
+        return render(req, 'courses/lesson.html', {'course': course})
+    return render(req, 'home/error.html', {'error_message': 'Khóa học đã hết hạn, không thể tiếp tục học!'})
+
+@login_only
+@enrolled_only
+def rating_view(req: HttpRequest, course_id):
+    """
+    Rate a course
+    """
+    course = get_object_or_404(Course, id=course_id)
+
+    # User can only rate a course after it has ended
+    if not course.is_ended:
+        return render(req, 'home/error.html', 
+            {'error_message': 'Khóa học chưa kết thúc, bạn không thể đánh giá!'})
+    
+    if req.method == 'POST':
+        form = RatingForm(req.POST, req.FILES)
+        if form.is_valid():
+            # Delete rating if user has rated before
+            rating = Rating.objects.filter(course=course, user=req.user)
+            if rating.exists():
+                rating.delete()
+
+            rating = form.save(commit=False)
+            rating.user = req.user 
+            rating.course = course
+            rating.save()
+            messages.success(req, 'Đã đánh giá thành công khóa học.')
+            return redirect(reverse('details', kwargs={'course_id': course_id}))
+        else:
+            messages.error(req, 'Biểu mẫu không hợp lệ! Vui lòng kiểm tra lại.')
+    
+    form = RatingForm()
+    context = {'form': form}
+    return render(req, 'courses/rate.html', context)

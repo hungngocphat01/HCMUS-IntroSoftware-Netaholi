@@ -3,9 +3,9 @@
 {% block content %}
     <div>
         <h1>{{course.name}}</h1>
-        <img src="data:image/png;base64,{{ course.get_base64_image }}" alt="Ảnh minh họa {{ course.name }}">
+        <img src="data:image/png;base64,{{ course.base64_cover_image }}" alt="Ảnh minh họa {{ course.name }}">
         <ul>
-            <li>Trạng thái: {{course.get_status_display}}</li>
+            <li>Thời hạn: {{ course.duration }} ngày ({{course.get_status_display}})</li>
             <li>Lịch trình:
                 <p>{{course.schedule}}</p>
             </li>

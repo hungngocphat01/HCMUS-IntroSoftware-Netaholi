@@ -1,9 +1,10 @@
 {% extends 'home/base.html' %}
 {% load static %}
+{% load bootstrap %}
 
 
 {% block content %}
-    <div>
+    <center>
         <h1>Đánh giá khóa học</h1>
         <h2>{{course.name}}</h2>
         
@@ -15,15 +16,15 @@
                 <span id="rt-star-3" class="fa fa-star"></span>
                 <span id="rt-star-4" class="fa fa-star"></span>
                 <span id="rt-star-5" class="fa fa-star"></span>
-            <div>
-
-            <div>
-            {{ form.as_p }}
             </div>
 
-            <div><input type="submit" value="Xác nhận"></div>
+            <div>
+                {{ form|bootstrap_horizontal }}
+            </div>
+
+            <div><input class="btn btn-primary" type="submit" value="Xác nhận"></div>
         </form>
-    </div>
+    </center>
 {% endblock content %}
 
 {% block script %}

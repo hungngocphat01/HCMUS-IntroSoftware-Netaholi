@@ -2,25 +2,27 @@
 {% load static %}
 
 {% block content %}
-    <h1>Welcome to Netaholi</h1>
-    <h2>Đây là các khóa học có trong hệ thống</h2>
+    <div class="p-3" style="text-align: center;">
+        <h1>Netaholi</h1>
+        <h4>Hệ thống học trực tuyến hàng đầu Việt Nam</h4>
+    </div>
+    <div class="container-fluid">
+        <div class="d-flex flex-row flex-nowrap">
+        {% for course in courses %}
+            <div class="card m-3">
+                <ul class="list-group list-group-flush">
+                    <img class="list-group-item center-cropped" src="data:image/png;base64,{{ course.base64_cover_image }}" alt="Ảnh minh họa {{ course.name }}">
+                    <h4 style="text-align: center;" class="card-title list-group-item"><a href="{% url 'details' course.id %}">{{ course.name }}</a></h4>
 
-    {% for course in courses %}
-        <h3><a href="{% url 'details' course.id %}">{{course.name}}</a></h3>
-        <img src="data:image/png;base64,{{ course.base64_cover_image }}" alt="Ảnh minh họa {{ course.name }}">
-        <ul>
-            <li>Loại khóa học: {{course.ctype}}</li>
-            <li>Ngày bắt đầu: {{course.start_date}}</li>
-            <li>Thời hạn: {{ course.duration }} ngày ({{course.get_status_display}})</li>            <li>Loại khóa học: {{course.ctype}}</li>
-            <li>Học phí: {{course.tuition_fee}}</li>
-            <li>Mô tả:
-                <p>{{course.description}}</p>
-            </li>
-            <li>Lịch trình:
-                <p>{{course.schedule}}</p>
-            </li>
-        </ul>
-    {% endfor %}
+                    <li class="list-group-item">Loại khóa học: {{course.ctype}}</li>
+                    <li class="list-group-item">Ngày bắt đầu: {{course.start_date}}</li>
+                    <li class="list-group-item">Thời hạn: {{ course.duration }} ngày ({{course.get_status_display}})</li>
+                    <li class="list-group-item">Học phí: {{course.tuition_fee}}</li>
+                </ul>
+            </div>
+        {% endfor %}
+        </div>
+    </div>
 {% endblock content %}
 
 

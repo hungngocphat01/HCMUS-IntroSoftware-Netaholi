@@ -23,10 +23,13 @@ def account_register_view(req: HttpRequest, account_type):
     """
     Register page
     """
+    context = {}
     if account_type == 'teacher':
         form = TeacherSignUpForm()
+        context['role'] = 'giảng viên'
     else:
         form = SignUpForm()
+        context['role'] = 'học viên'
 
     if req.method == 'POST':
         if account_type == 'teacher':
@@ -43,20 +46,20 @@ def account_register_view(req: HttpRequest, account_type):
             user.userprofile.profession = form.cleaned_data.get('profession')
             user.userprofile.department = form.cleaned_data.get('department')
             user.userprofile.birthday = form.cleaned_data.get('birthday')
+            user.userprofile.gender = form.cleaned_data.get('gender')
             # If account is teacher => extra information
             if account_type == 'teacher':
                 user.userprofile.bio = form.cleaned_data.get('bio')
                 user.userprofile.is_teacher = True
                 user.is_active = False
-                messages.warning('Tài khoản của bạn đã được tạo, vui lòng đợi xác nhận từ phía hệ thống.')
-            user.userprofile.gender = form.cleaned_data.get('gender')
+                messages.warning(req, 'Tài khoản của bạn đã được tạo, vui lòng đợi xác nhận từ phía hệ thống.')
+            else:
+                messages.info(req, 'Tài khoản của bạn đã được tạo!')
             user.save()
 
-            if account_type != 'teacher':
-                messages.info('Tài khoản của bạn đã được tạo!')
-            return redirect(req, 'login')
+            return redirect('login')
         
-    context = {'form': form}
+    context['form'] = form
     return render(req, 'home/register.html', context)
 
 
@@ -69,6 +72,21 @@ def login_page_view(req: HttpRequest):
     elif req.method == 'POST':
         username = req.POST.get('username')
         password = req.POST.get('password')
+
+        # Check user is locked
+        try:
+            user: User = User.objects.get(username=username)
+        except User.DoesNotExist:
+            messages.error(req, 'Tên đăng nhập không tồn tại trên hệ thống')
+            return redirect('login')
+        
+        if not user.is_active:
+            if user.userprofile.is_teacher:
+                messages.error(req, 'Tài khoản của bạn đang chờ QTV xác nhận.')
+            else:
+                messages.error(req, 'Tài khoản của bạn đã bị đình chỉ. Vui lòng liên hệ QTV.')
+            return redirect('login')
+
         user = authenticate(username=username, password=password)
         if user is not None:
             print('User authenticated:', username)
@@ -76,7 +94,7 @@ def login_page_view(req: HttpRequest):
             return redirect('home')
         else:
             print('Login error')
-            messages.error(req, 'Sai tên đăng nhập hoặc mật khẩu')
+            messages.error(req, 'Sai mật khẩu')
             return redirect('login')
 
 

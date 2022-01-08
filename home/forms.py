@@ -20,6 +20,7 @@ class SignUpForm(UserCreationForm):
     email = forms.EmailField(max_length=MAX_LENGTH_LONG, label='Email', required=True)
     profession = forms.CharField(max_length=MAX_LENGTH_LONG, label='Nghề nghiệp', required=True)
     department = forms.CharField(max_length=MAX_LENGTH_LONG, label='Đơn vị công tác', required=True)
+    accept_policy = forms.BooleanField(label='Tôi đồng ý với điều khoản sử dụng dịch vụ của Netaholi', required=True)
     
     class Meta:
         model = User

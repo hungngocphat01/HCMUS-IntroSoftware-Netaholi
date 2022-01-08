@@ -1,9 +1,20 @@
 {% load static %}
 
 {% if messages %}
-<ul class="messages">
+<div class="messages">
     {% for message in messages %}
-    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    <div role="alert" class="alert
+    {% if message.tags %}
+        {% if message.tags == 'error' %}
+            alert-danger
+        {% else %}
+            alert-{{ message.tags }} 
+        {% endif %}
+    {% else %}
+        alert-primary
+    {% endif %}">
+        {{ message }}
+    </div>
     {% endfor %}
-</ul>
+</div>
 {% endif %}

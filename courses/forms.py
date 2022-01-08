@@ -5,15 +5,6 @@ from django.forms import fields, widgets
 from .models import MAX_LENGTH_LONG, MAX_LENGTH_MED, Course, Material, Rating
 
 
-class CourseDetailsForm(forms.ModelForm):
-    """
-    Form for edit or create a new course
-    """
-    class Meta:
-        model = Course
-        fields = '__all__'
-
-
 class MaterialForm(forms.ModelForm):
     """
     Form for edit or create a new course material

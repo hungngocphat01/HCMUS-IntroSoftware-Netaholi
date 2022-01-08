@@ -7,6 +7,7 @@ from django.dispatch import receiver
 MAX_LENGTH_LONG = 100
 MAX_LENGTH_MED = 50
 
+User._meta.get_field('email')._unique = True
 
 class UserProfile(models.Model):
     GENDER_CHOICES = (
@@ -28,6 +29,17 @@ class UserProfile(models.Model):
     @staticmethod
     def get_all_waiting_teachers():
         return User.objects.filter(userprofile__is_teacher=True, is_active=False)
+    
+    def is_teacher_admin(self):
+        return self.is_teacher or self.user.is_staff
+    
+    def get_role_repr(self):
+        if self.user.is_staff:
+            return 'Quản trị viên'
+        elif self.is_teacher:
+            return 'Giáo viên'
+        else:
+            return 'Học viên'
 
 
 # Database trigger

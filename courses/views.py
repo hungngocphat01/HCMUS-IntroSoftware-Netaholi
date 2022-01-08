@@ -1,4 +1,5 @@
 import secrets
+from django import http
 from django.shortcuts import redirect, render, get_object_or_404
 from django.contrib import messages
 from django.urls import reverse
@@ -17,8 +18,9 @@ def detail_page_view(req: HttpRequest, course_id):
     if req.method == 'GET':
         course: Course = Course.objects.get(id=course_id)
         user_enrolled = course.is_enrolled(req.user.username)
+        teachers = CourseTeachers.objects.filter(course__id=course_id)
 
-        context = {'course': course, 'user_enrolled': user_enrolled}
+        context = {'course': course, 'user_enrolled': user_enrolled, 'course_teachers': teachers}
         return render(req, 'courses/details.html', context)
 
 
@@ -65,18 +67,19 @@ def dashboard_view(req, course_id):
 
 
 @enrolled_only
-def material_view(req, course, course_id):
+def material_view(req, course_id, material_id):
     """
     View a course material
     """
-    course = get_object_or_404(Course, id=course)
-    material = get_object_or_404(Material, id=course_id)
+    course = get_object_or_404(Course, id=course_id)
+    material = get_object_or_404(Material, id=material_id)
     context = {'course': course, 'material': material}
     return render(req, 'courses/material.html', context)
 
 
 @teacher_admin_only
 @enrolled_only
+@course_expire_check
 def material_create_view(req, course_id):
     """
     Create a course material
@@ -97,6 +100,7 @@ def material_create_view(req, course_id):
 
 @teacher_admin_only
 @enrolled_only
+@course_expire_check
 def material_create_edit(req, course_id, material_id):
     """
     Edit a course material
@@ -117,14 +121,13 @@ def material_create_edit(req, course_id, material_id):
 
 @login_only
 @enrolled_only
+@course_expire_check
 def lesson_view(req, course_id):
     """
     Attend a course lesson
     """
     course = get_object_or_404(Course, id=course_id)
-    if not course.is_ended:
-        return render(req, 'courses/lesson.html', {'course': course})
-    return render(req, 'home/error.html', {'error_message': 'Khóa học đã hết hạn, không thể tiếp tục học!'})
+    return render(req, 'courses/lesson.html', {'course': course})
 
 @login_only
 @enrolled_only
@@ -159,3 +162,27 @@ def rating_view(req: HttpRequest, course_id):
     form = RatingForm()
     context = {'form': form}
     return render(req, 'courses/rate.html', context)
+
+@login_only
+def my_courses_view(req: HttpRequest):
+    student_courses = Course.objects.filter(coursestudents__student__username=req.user.username)
+    teacher_courses = Course.objects.filter(courseteachers__teacher__username=req.user.username)
+
+    context = {
+        'student_courses': student_courses, 
+        'teacher_courses': teacher_courses, 
+        'listname': 'Các khóa học của tôi'
+    }
+    return render(req, 'courses/course_list.html', context)
+
+@login_only
+def search_view(req: HttpRequest):
+    keyword = req.GET.get('q', '')
+    print("Keyword:", keyword)
+    courses = Course.objects.filter(name__icontains=keyword)
+
+    context = {
+        'courses': courses,
+        'keyword': keyword
+    }
+    return render(req, 'courses/course_search.html', context)

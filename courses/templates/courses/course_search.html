@@ -1,0 +1,15 @@
+{% extends 'home/base.html' %} 
+
+{% block content %}
+    <h1>Tìm kiếm khóa học</h1>
+    <div>
+        <h5>Từ khóa: {{ keyword }}</h5>
+    </div>
+    <div>
+        <div class="list-group">
+        {% for course in courses %}
+            {% include 'courses/course_list_item_part.html' %}
+        {% endfor %}
+        </div>
+    </div>
+{% endblock content %}

@@ -2,8 +2,9 @@ from django.contrib import messages
 from django.http.request import HttpRequest
 from django.shortcuts import redirect, render, get_object_or_404
 from django.urls import reverse
-from courses.models import Course, Material
-from courses.forms import *
+from courses import admin
+from courses.models import Course, CourseTeachers, Material
+from .forms import *
 from .decorators import *
 
 
@@ -23,6 +24,32 @@ def manager_courses_view(req):
     context = {'courses': courses}
     return render(req, 'manager/manager_courses.html', context)
 
+@admin_only
+def manager_users_view(req):
+    users = User.objects.all()
+
+    context = {'users': users}
+    return render(req, 'manager/manager_users.html', context)
+
+@admin_only
+def manager_user_edit_view(req, username):
+    user = get_object_or_404(req, username=username)
+
+    if req == 'POST':
+        ...
+
+@admin_only 
+def user_delete_endpoint(req, username):
+    user = get_object_or_404(User, username=username)
+    user.delete()
+    return redirect('manager_user')
+
+@admin_only 
+def user_active_flip_endpoint(req, username):
+    user = get_object_or_404(User, username=username)
+    user.is_active = not user.is_active
+    user.save()
+    return redirect('manager_user')
 
 @admin_only
 def course_create_view(req):
@@ -40,7 +67,7 @@ def course_create_view(req):
             course = form.save(commit=False)
             course.cover_image_binary = form.cleaned_data['cover_image'].file.read()
             course.save()
-            messages.info(req, f"Khóa học đã được tạo: {course.name}")
+            messages.success(req, 'Khóa học đã được tạo: %s' % course.name)
             print('New course created')
             return redirect('course_create')
         else:
@@ -62,7 +89,7 @@ def course_edit_view(req, course_id):
             course = form.save(commit=False)
             course.cover_image_binary = form.cleaned_data['cover_image'].file.read()
             course.save()
-            messages.info(req, f"Khóa học đã được sửa: {course.name}")
+            messages.success(req, 'Khóa học đã được sửa: %s' % course.name)
             print("Course saved!")
             return redirect('manager_course')
         else:
@@ -80,8 +107,8 @@ def course_delete_view(req: HttpRequest, course_id):
     elif req.method == 'POST':
         course_name = course.name
         course.delete()
-        messages.info(req, f"Khóa học đã được xóa: {course_name}")
-        return redirect(req, 'manager_courses')
+        messages.success(req, "Khóa học đã được xóa: %s" % course_name)
+        return redirect('manager_courses')
 
 
 @admin_only
@@ -93,16 +120,16 @@ def teacher_approve_list_view(req: HttpRequest):
     if req.method == 'POST':
         teacher_username = req.POST.get('teacher_username')
         teacher_instance = get_object_or_404(User, username=teacher_username)
-        teacher_name = teacher_instance.last_name + teacher_instance.first_name
+        teacher_name = str(teacher_instance.last_name + teacher_instance.first_name)
 
         if 'req_approve' in req.POST:
             teacher_instance.is_active = True
             teacher_instance.save()
-            messages.info(f"Đã xét duyệt giáo viên: {teacher_name}")
+            messages.success(req, 'Đã xét duyệt giáo viên: %s' % teacher_name)
             # TODO: send notification email
         elif 'req_disaprv' in req.POST:
             teacher_instance.delete()
-            messages.info(f"Đã từ chối giáo viên: {teacher_name}")
+            messages.success(req, 'Đã từ chối giáo viên: %s' % teacher_name)
             # TODO: send notification email
         else:
             return render(req, 'home/error.html',
@@ -111,3 +138,27 @@ def teacher_approve_list_view(req: HttpRequest):
 
     context = {'waiting_teachers': waiting_teachers}
     return render(req, 'manager/teacher_approve_list.html', context)
+
+@admin_only
+def teacher_assign_view(req: HttpRequest, course_id):
+    course = get_object_or_404(Course, id=course_id)
+    
+    if req.method == 'POST':
+        form = AssignTeacherForm(req.POST)
+        if form.is_valid():
+            form.save()
+
+    course_teacher = CourseTeachers.objects.filter(course=course)
+    form = AssignTeacherForm(initial={'course': course})
+
+    ctx = {'course_teachers': course_teacher, 'form': form, 'course': course}
+    return render(req, 'manager/teacher_assign.html', ctx)
+
+@admin_only
+def teacher_deassign_view(req: HttpRequest, course_id, username):
+    if req.method == 'POST':
+        entry = get_object_or_404(CourseTeachers, course__id=course_id, teacher__username=username)
+        entry.delete()
+        return redirect(reverse('assng_teacher_course', kwargs={'course_id': course_id}))
+    else:
+        return render(req, 'home/error.html', {'error_message': 'Lỗi hệ thống! Endpoint này không hỗ trợ GET.\nVui lòng liên hệ nhà phát triển.'})

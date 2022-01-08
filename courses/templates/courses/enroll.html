@@ -1,22 +1,35 @@
 {% extends 'home/base.html' %}
+{% load bootstrap %}
 {% load static %}
 
 {% block content %}
-    <div>
+    <div class="container">
         <h1>Đăng ký khóa học</h1>
-        <h2>{{ course.name }}</h2>
-        <img src="data:image/png;base64,{{ course.base64_cover_image }}" alt="Ảnh minh họa {{ course.name }}">
-        <p>{{ course.description }}</p>
-    </div>
+        <ul class="list-group">
+            <div class="list-group-item">
+                <h2>{{course.name}} </h2>
+            </div>
+            <div class="list-group-item">
+                <img src="data:image/png;base64,{{ course.base64_cover_image }}" alt="Ảnh minh họa {{ course.name }}">
+            </div>
+            <li class="list-group-item"><b>Ngày bắt đầu</b>:<br> {{course.start_date}}</li>
+            <li class="list-group-item"><b>Thời hạn</b>:<br> {{ course.duration }} ngày ({{course.get_status_display}})</li>
+            <li class="list-group-item"><b>Loại khóa học</b>:<br> {{course.ctype}}</li>
+            <li class="list-group-item"><b>Mô tả</b>:<br>
+                <p>{{course.description}}</p>
+            </li>
+            <li class="list-group-item"><b>Lịch trình</b>:<br>
+                <p>{{course.schedule}}</p>
+            </li>
 
-    <div>
-        <ul>
-            <li>Lịch học: {{ course.schedule }}</li>
-            <li>Ngày bắt đầu học: {{ course.start_date }}</li>
-            <li>Loại khóa học: {{ course.ctype }}</li>
+            <li class="list-group-item text-danger"><b>Mã đơn đăng ký</b>:<br>
+                <p>{{invoice_id}}</p>
+            </li>
+
+            <li class="list-group-item">
+                <p><b>Bạn cần thanh toán:<br> {{ course.tuition_fee }} VNĐ</b></p>
+            </li>
         </ul>
-        <p>Mã đơn đăng ký: {{ invoice_id }}</p>
-        <p>Bạn cần thanh toán: {{ course.tuition_fee }}</p>
     </div>
 
     <div>
@@ -37,7 +50,7 @@
         </div>
         <div>
             Sau khi chuyển tiền xong, nhấn vào nút dưới đây.<br>
-            <input type="Submit" value="Hoàn tất">
+            <input class="btn btn-primary" type="Submit" value="Hoàn tất">
         </div>
     </form>
 {% endblock %}

@@ -87,7 +87,8 @@ def course_edit_view(req, course_id):
         form = CourseDetailsForm(req.POST, req.FILES, instance=course)
         if form.is_valid():
             course = form.save(commit=False)
-            course.cover_image_binary = form.cleaned_data['cover_image'].file.read()
+            if form.cleaned_data['cover_image']:
+                course.cover_image_binary = form.cleaned_data['cover_image'].file.read()
             course.save()
             messages.success(req, 'Khóa học đã được sửa: %s' % course.name)
             print("Course saved!")

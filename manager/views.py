@@ -33,10 +33,8 @@ def manager_users_view(req):
 
 @admin_only
 def manager_user_edit_view(req, username):
-    user = get_object_or_404(req, username=username)
-
-    if req == 'POST':
-        ...
+    user = get_object_or_404(User, username=username)
+    return render(req, 'manager/user_info.html', {'user': user})
 
 @admin_only 
 def user_delete_endpoint(req, username):

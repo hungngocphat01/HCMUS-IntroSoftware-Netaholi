@@ -19,8 +19,13 @@ def detail_page_view(req: HttpRequest, course_id):
         course: Course = Course.objects.get(id=course_id)
         user_enrolled = course.is_enrolled(req.user.username)
         teachers = CourseTeachers.objects.filter(course__id=course_id)
+        ratings = course.rating_set.all()
 
-        context = {'course': course, 'user_enrolled': user_enrolled, 'course_teachers': teachers}
+        context = {'course': course, 
+            'user_enrolled': user_enrolled, 
+            'course_teachers': teachers,
+            'ratings': ratings,
+        }
         return render(req, 'courses/details.html', context)
 
 
@@ -180,7 +185,9 @@ def search_view(req: HttpRequest):
     keyword = req.GET.get('q', '')
     print("Keyword:", keyword)
     courses = Course.objects.filter(name__icontains=keyword)
+    courses = courses.union(Course.objects.filter(description__icontains=keyword))
 
+    
     context = {
         'courses': courses,
         'keyword': keyword

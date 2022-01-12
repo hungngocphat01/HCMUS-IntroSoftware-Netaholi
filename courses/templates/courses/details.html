@@ -43,6 +43,7 @@
             <li class="list-group-item"><b>Loại khóa học</b>:<br> {{course.ctype}}</li>
             <li class="list-group-item"><b>Học phí</b>:<br> {{course.tuition_fee}}</li>
             <li class="list-group-item"><b>Loại khóa học</b>:<br> {{course.ctype}}</li>
+            <li class="list-group-item"><b>Đánh giá trung bình</b>:<br> {{course.average_rating}}</li>
             <li class="list-group-item"><b>Mô tả</b>:<br>
                 <p>{{course.description}}</p>
             </li>
@@ -60,10 +61,10 @@
     </div>
 
     {% if course.is_ended %}
-    <div class="container">
+    <div class="container mt-3">
         <h2>Các đánh giá khóa học</h2>
         <ul class="list-group">
-            {% for rate in course.ratings %}
+            {% for rate in ratings %}
                 <li class="list-group-item">{{ rate.star }} <span class="fa fa-star"></span> <br> 
                     {{ rate.content }}</li>
             {% endfor %}

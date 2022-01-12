@@ -63,11 +63,18 @@ class Course(models.Model):
             self.status = 'ended'
 
         return self.status == 'ended'
+    
+    @property
+    def average_rating(self):
+        ratings = self.rating_set.all().values_list('star', flat=True)
+        if len(ratings) == 0:
+            return 'Chưa có đánh giá'
+        return round(sum(ratings)/len(ratings), 2)
 
 
 class Rating(models.Model):
-    user = models.OneToOneField(User, on_delete=models.SET_NULL, null=True, verbose_name='Người dùng')
-    course = models.OneToOneField(Course, on_delete=models.CASCADE, verbose_name='Khóa học')
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, verbose_name='Người dùng')
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, verbose_name='Khóa học')
     content = models.TextField(verbose_name='Nội dung')
     star = models.SmallIntegerField(
         validators=[MaxValueValidator(5), MinValueValidator(1)],

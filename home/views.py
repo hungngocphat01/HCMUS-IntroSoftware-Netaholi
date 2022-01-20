@@ -3,11 +3,20 @@ from django.shortcuts import render, redirect
 from django.http import HttpRequest, HttpResponse
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.sites.shortcuts import get_current_site
+from django.template.loader import render_to_string
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes, force_text
+from django.core.mail import EmailMessage
+from django.conf import settings
+
 
 from courses.models import Course
 
 from .forms import TeacherSignUpForm, SignUpForm
+from .tokens import account_activation_token
 
 
 def home_page_view(req: HttpRequest):
@@ -39,7 +48,6 @@ def account_register_view(req: HttpRequest, account_type):
 
         if form.is_valid():
             user: User = form.save()
-            user.refresh_from_db()
             user.first_name = form.cleaned_data.get('first_name')
             user.last_name = form.cleaned_data.get('last_name')
             user.email = form.cleaned_data.get('email')
@@ -47,15 +55,38 @@ def account_register_view(req: HttpRequest, account_type):
             user.userprofile.department = form.cleaned_data.get('department')
             user.userprofile.birthday = form.cleaned_data.get('birthday')
             user.userprofile.gender = form.cleaned_data.get('gender')
+            user.is_active = False
+            
+            # Send confirmation email
+            current_site = get_current_site(req)
+            mail_subject = 'Kích hoạt tài khoản Netaholi của bạn'
+            to_email = form.cleaned_data.get('email')
+
+            print(settings.EMAIL_HOST_USER, settings.EMAIL_HOST_PASSWORD)
+
             # If account is teacher => extra information
             if account_type == 'teacher':
                 user.userprofile.bio = form.cleaned_data.get('bio')
                 user.userprofile.is_teacher = True
-                user.is_active = False
+                message = render_to_string('home/acc_active_email_teacher.html', {
+                    'user': user
+                })
                 messages.warning(req, 'Tài khoản của bạn đã được tạo, vui lòng đợi xác nhận từ phía hệ thống.')
             else:
                 messages.info(req, 'Tài khoản của bạn đã được tạo!')
+                message = render_to_string('home/acc_active_email.html', {
+                    'user': user,
+                    'domain': current_site.domain,
+                    'uid':urlsafe_base64_encode(force_bytes(user.pk)),
+                    'token':account_activation_token.make_token(user),
+                })
             user.save()
+
+            email = EmailMessage(
+                mail_subject, message, to=[to_email]
+            )
+            email.send()
+            print('Email sent')
 
             return redirect('login')
         
@@ -84,7 +115,7 @@ def login_page_view(req: HttpRequest):
             if user.userprofile.is_teacher:
                 messages.error(req, 'Tài khoản của bạn đang chờ QTV xác nhận.')
             else:
-                messages.error(req, 'Tài khoản của bạn đã bị đình chỉ. Vui lòng liên hệ QTV.')
+                messages.error(req, 'Tài khoản của bạn chưa được kích hoạt. Vui lòng kiểm tra email xác nhận.')
             return redirect('login')
 
         user = authenticate(username=username, password=password)
@@ -105,3 +136,36 @@ def logout_page_view(req: HttpRequest):
 
 def choose_acc_register_view(req: HttpRequest):
     return render(req, 'home/register_choose.html')
+
+@login_required
+def change_password_view(req: HttpRequest):
+    form = PasswordChangeForm(user=req.user)
+    context = {'form': form}
+
+    if req.method == 'POST':
+        form = PasswordChangeForm(user=req.user, data=req.POST or None)
+        if form.is_valid():
+            form.save()
+            update_session_auth_hash(req, form.user)
+            messages.success(req, 'Mật khẩu của bạn đã được cập nhật thành công!')
+            return redirect('home')
+        else:
+            print(form.errors)
+            messages.error(req, 'Đã có lỗi xảy ra, vui lòng kiểm tra lại!!')
+    
+    return render(req, 'home/change_pwd.html', context)
+
+def activate_view(request, uidb64, token):
+    try:
+        uid = force_text(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+    except(TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+    if user is not None and account_activation_token.check_token(user, token):
+        user.is_active = True
+        user.save()
+        login(request, user)
+        # return redirect('home')
+        return HttpResponse('Thank you for your email confirmation. Now you can login your account.')
+    else:
+        return HttpResponse('Activation link is invalid!')

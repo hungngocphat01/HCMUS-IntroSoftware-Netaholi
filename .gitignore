@@ -137,3 +137,5 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 postgres-data/
+
+run_server.sh

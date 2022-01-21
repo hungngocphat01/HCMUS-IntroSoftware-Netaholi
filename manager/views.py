@@ -110,7 +110,7 @@ def course_delete_view(req: HttpRequest, course_id):
         course_name = course.name
         course.delete()
         messages.success(req, "Khóa học đã được xóa: %s" % course_name)
-        return redirect('manager_courses')
+        return redirect('manager_course')
 
 
 @admin_only

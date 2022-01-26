@@ -91,9 +91,9 @@ WSGI_APPLICATION = 'netaholi.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'netaholi',
-        'USER': 'netaholi',
-        'PASSWORD': '123456',
+        'NAME': os.environ.get('NETAHOLI_DB_NAME'),
+        'USER': os.environ.get('NETAHOLI_USER'),
+        'PASSWORD': os.environ.get('NETAHOLI_DB_PASSWORD'),
         'HOST': 'localhost',
         'PORT': '',
     }

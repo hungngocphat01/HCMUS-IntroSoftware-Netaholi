@@ -32,6 +32,9 @@ def account_register_view(req: HttpRequest, account_type):
     """
     Register page
     """
+    if not settings.EMAIL_HOST_USER:
+        print('Warning: EMAIL_HOST_USER is empty!!')
+        
     context = {}
     if account_type == 'teacher':
         form = TeacherSignUpForm()
@@ -55,7 +58,9 @@ def account_register_view(req: HttpRequest, account_type):
             user.userprofile.department = form.cleaned_data.get('department')
             user.userprofile.birthday = form.cleaned_data.get('birthday')
             user.userprofile.gender = form.cleaned_data.get('gender')
-            user.is_active = False
+            
+            if settings.EMAIL_HOST_USER:
+                user.is_active = False
             
             # Send confirmation email
             current_site = get_current_site(req)
@@ -68,6 +73,7 @@ def account_register_view(req: HttpRequest, account_type):
             if account_type == 'teacher':
                 user.userprofile.bio = form.cleaned_data.get('bio')
                 user.userprofile.is_teacher = True
+                user.is_active = False
                 message = render_to_string('home/acc_active_email_teacher.html', {
                     'user': user
                 })
@@ -85,8 +91,9 @@ def account_register_view(req: HttpRequest, account_type):
             email = EmailMessage(
                 mail_subject, message, to=[to_email]
             )
-            email.send()
-            print('Email sent')
+            if settings.EMAIL_HOST_USER:
+                email.send()
+                print('Email sent')
 
             return redirect('login')
         
